@@ -11,15 +11,15 @@ const COCO_DECK_TEMPLATE = [
 ];
 
 const TWO_PLAYER_ISLANDS = [
-  { id: 0, x: 610, y: 170, rx: 72, ry: 82, resource: "spooky", pip: null, label: "Spooky" },
-  { id: 1, x: 430, y: 205, rx: 84, ry: 76, resource: "molasses", pip: 5, label: "Molasses" },
+  { id: 0, x: 610, y: 170, rx: 72, ry: 82, resource: "cutlass", pip: 1, label: "Cutlass" },
+  { id: 1, x: 430, y: 205, rx: 84, ry: 76, resource: "molasses", pip: 4, label: "Molasses" },
   { id: 2, x: 295, y: 285, rx: 74, ry: 72, resource: "wood", pip: 4, label: "Wood" },
   { id: 3, x: 585, y: 300, rx: 84, ry: 78, resource: "goat", pip: 2, label: "Goat" },
-  { id: 4, x: 450, y: 360, rx: 58, ry: 48, resource: "gold", pip: 1, label: "Gold" },
+  { id: 4, x: 450, y: 360, rx: 58, ry: 48, resource: "gold", pip: 5, label: "Gold" },
   { id: 5, x: 610, y: 450, rx: 84, ry: 80, resource: "wood", pip: 3, label: "Wood" },
-  { id: 6, x: 430, y: 500, rx: 86, ry: 78, resource: "molasses", pip: 4, label: "Molasses" },
-  { id: 7, x: 280, y: 455, rx: 84, ry: 78, resource: "goat", pip: 3, label: "Goat" },
-  { id: 8, x: 235, y: 590, rx: 76, ry: 86, resource: "spooky", pip: null, label: "Spooky" }
+  { id: 6, x: 430, y: 500, rx: 86, ry: 78, resource: "molasses", pip: 3, label: "Molasses" },
+  { id: 7, x: 280, y: 455, rx: 84, ry: 78, resource: "goat", pip: 1, label: "Goat" },
+  { id: 8, x: 235, y: 590, rx: 76, ry: 86, resource: "cutlass", pip: 2, label: "Cutlass" }
 ];
 
 const SEA_NODES = [
