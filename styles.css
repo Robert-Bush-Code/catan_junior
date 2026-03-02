@@ -1,0 +1,48 @@
+:root {
+  --bg: #f9f3e6;
+  --panel: #fffdf7;
+  --line: #333;
+  --ship: #7c4d1e;
+}
+body { font-family: Arial, sans-serif; background: var(--bg); margin: 0; padding: 1rem; }
+header { margin-bottom: 1rem; }
+h1 { margin: 0; }
+.subtitle { margin-top: .3rem; color: #5b4a2f; }
+.setup, .game { background: var(--panel); padding: 1rem; border-radius: 10px; box-shadow: 0 2px 6px #0002; }
+.player-inputs { display: grid; gap: .5rem; margin: .75rem 0; max-width: 320px; }
+input, select, button { padding: .4rem .5rem; border-radius: 6px; border: 1px solid #999; }
+button { cursor: pointer; background: #fff; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+.status-bar, .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: .8rem; }
+.board-and-sidebar { display: grid; grid-template-columns: minmax(600px, 2fr) minmax(260px, 1fr); gap: 1rem; align-items: start; }
+.board { width: 100%; background: #d9eef9; border-radius: 10px; display: block; aspect-ratio: 4 / 3; }
+.tile { stroke: #304050; stroke-width: 2; cursor: pointer; }
+.tile-number, .tile-label, .ghost-mark { text-anchor: middle; pointer-events: none; font-weight: bold; }
+.tile-number { fill: #111; }
+.tile-label { fill: #102030; font-size: 11px; text-transform: capitalize; }
+.ghost-mark { font-size: 20px; }
+.res-lumber { fill: #83b84f; }
+.res-goat { fill: #f6f1d5; }
+.res-molasses { fill: #9e6535; }
+.res-sword { fill: #8fa3b5; }
+.res-gold { fill: #e4c445; }
+.edge { stroke-width: 6; stroke-linecap: round; cursor: pointer; }
+.edge.open { stroke: #7f8c8d; }
+.edge.owned { stroke: var(--ship); }
+.node { cursor: pointer; stroke: #111; stroke-width: 1.5; }
+.node.open { fill: white; }
+.node.owned { fill: #222; }
+.buildable { filter: drop-shadow(0 0 6px #ffde59); }
+.player-0 { stroke: #e53935 !important; fill: #e53935 !important; }
+.player-1 { stroke: #1e88e5 !important; fill: #1e88e5 !important; }
+.player-2 { stroke: #43a047 !important; fill: #43a047 !important; }
+.player-3 { stroke: #f4511e !important; fill: #f4511e !important; }
+.sidebar { background: #fff; border-radius: 8px; padding: .8rem; }
+.player-card { border: 1px solid #ddd; border-radius: 8px; padding: .5rem; margin-bottom: .5rem; }
+.player-card.active { border-color: #ff9800; box-shadow: 0 0 0 2px #ff980055; }
+.res-list { display: flex; flex-wrap: wrap; gap: .4rem .7rem; font-size: .9rem; }
+.winner { font-size: 1.1rem; font-weight: bold; color: #2e7d32; }
+.hint { color: #5d4037; }
+@media (max-width: 1000px) {
+  .board-and-sidebar { grid-template-columns: 1fr; }
+}

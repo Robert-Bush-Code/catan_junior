@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catan Junior (Local Vue Edition)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🏴‍☠️ Catan Junior (Local Vue Edition)</h1>
+      <p class="subtitle">Kid-friendly, local hot-seat version inspired by Catan Junior rules.</p>
+    </header>
+
+    <section class="setup" v-if="!gameStarted">
+      <h2>Game Setup</h2>
+      <label>
+        Number of players:
+        <select v-model.number="setup.playerCount">
+          <option :value="2">2</option>
+          <option :value="3">3</option>
+          <option :value="4">4</option>
+        </select>
+      </label>
+      <div class="player-inputs">
+        <label v-for="(name, idx) in setup.names" :key="idx">
+          Player {{ idx + 1 }} name:
+          <input v-model="setup.names[idx]" maxlength="20" />
+        </label>
+      </div>
+      <button @click="startGame">Start Game</button>
+      <details>
+        <summary>Implemented rules notes</summary>
+        <ul>
+          <li>Roll 2 dice each turn to produce resources on matching number tiles (except where the Ghost sits).</li>
+          <li>Build ships to expand and hideouts to score points.</li>
+          <li>First player to 7 hideouts wins.</li>
+          <li>Gold can be used as a wildcard when paying costs.</li>
+          <li>Rolling 7 moves the Ghost to block one tile.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section v-else class="game">
+      <div class="status-bar">
+        <div><strong>Current player:</strong> <span :style="{color: currentPlayer.color}">{{ currentPlayer.name }}</span></div>
+        <div><strong>Turn phase:</strong> {{ turnPhaseLabel }}</div>
+        <div><strong>Last roll:</strong> {{ lastRollText }}</div>
+      </div>
+
+      <div class="controls">
+        <button @click="rollDice" :disabled="!canRoll">🎲 Roll Dice</button>
+        <button @click="setBuildMode('ship')" :disabled="!canBuild">Build Ship (Lumber + Molasses)</button>
+        <button @click="setBuildMode('hideout')" :disabled="!canBuild">Build Hideout (Lumber + Goat + Molasses + Sword)</button>
+        <button @click="setBuildMode('ghost')" :disabled="!mustMoveGhost">Move Ghost</button>
+        <button @click="endTurn" :disabled="!canEndTurn">End Turn</button>
+      </div>
+
+      <div class="board-and-sidebar">
+        <svg class="board" :viewBox="viewBox">
+          <g>
+            <g v-for="tile in tiles" :key="`tile-${tile.id}`" @click="handleTileClick(tile)">
+              <polygon :points="tile.points" :class="['tile', `res-${tile.resource}`, {ghost: tile.hasGhost}]" />
+              <text :x="tile.cx" :y="tile.cy - 10" class="tile-label">{{ tile.resource }}</text>
+              <text :x="tile.cx" :y="tile.cy + 12" class="tile-number">{{ tile.number }}</text>
+              <text v-if="tile.hasGhost" :x="tile.cx" :y="tile.cy + 30" class="ghost-mark">👻</text>
+            </g>
+          </g>
+
+          <g>
+            <line
+              v-for="edge in edges"
+              :key="`edge-${edge.id}`"
+              :x1="nodes[edge.a].x"
+              :y1="nodes[edge.a].y"
+              :x2="nodes[edge.b].x"
+              :y2="nodes[edge.b].y"
+              :class="['edge', edge.owner >= 0 ? 'owned' : 'open', edge.owner >= 0 ? `player-${edge.owner}` : '', buildMode==='ship' && canBuildShipOn(edge) ? 'buildable' : '']"
+              @click="handleEdgeClick(edge)"
+            />
+          </g>
+
+          <g>
+            <circle
+              v-for="node in nodes"
+              :key="`node-${node.id}`"
+              :cx="node.x"
+              :cy="node.y"
+              r="8"
+              :class="['node', node.owner >= 0 ? 'owned' : 'open', node.owner >= 0 ? `player-${node.owner}` : '', buildMode==='hideout' && canBuildHideoutOn(node) ? 'buildable' : '']"
+              @click="handleNodeClick(node)"
+            />
+          </g>
+        </svg>
+
+        <aside class="sidebar">
+          <h3>Players</h3>
+          <div v-for="p in players" :key="p.id" class="player-card" :class="{active: p.id === currentPlayer.id}">
+            <div class="name" :style="{color: p.color}">{{ p.name }}</div>
+            <div>Hideouts: {{ p.hideouts }}</div>
+            <div class="res-list">
+              <span v-for="res in resources" :key="`${p.id}-${res}`">{{ res }}: {{ p.resources[res] }}</span>
+            </div>
+          </div>
+
+          <p v-if="winnerId !== null" class="winner">
+            🎉 {{ players[winnerId].name }} wins with 7 hideouts!
+          </p>
+          <p class="hint">{{ hintText }}</p>
+        </aside>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
