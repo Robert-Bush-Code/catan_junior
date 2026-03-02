@@ -10,7 +10,7 @@
   <div id="app">
     <header>
       <h1>🏴‍☠️ Catan Junior (Local Vue Edition)</h1>
-      <p class="subtitle">Kid-friendly, local hot-seat version inspired by Catan Junior rules.</p>
+      <p class="subtitle">Focused on Catan Junior rules: 1 die, lairs/ships, Coco tiles, market, and Ghost Captain.</p>
     </header>
 
     <section class="setup" v-if="!gameStarted">
@@ -31,13 +31,14 @@
       </div>
       <button @click="startGame">Start Game</button>
       <details>
-        <summary>Implemented rules notes</summary>
+        <summary>Implemented Catan Junior rules</summary>
         <ul>
-          <li>Roll 2 dice each turn to produce resources on matching number tiles (except where the Ghost sits).</li>
-          <li>Build ships to expand and hideouts to score points.</li>
-          <li>First player to 7 hideouts wins.</li>
-          <li>Gold can be used as a wildcard when paying costs.</li>
-          <li>Rolling 7 moves the Ghost to block one tile.</li>
+          <li>Single die roll each turn: 1-5 produce, 6 moves Ghost Captain and grants 2 resources from chosen island.</li>
+          <li>Ghost Captain blocks production on the island where it stands.</li>
+          <li>Build costs: ship = 1 goat + 1 wood, lair = 1 cutlass + 1 goat + 1 molasses + 1 wood.</li>
+          <li>Builds alternate between lair and ship (free-build Coco tile can bypass cost).</li>
+          <li>Coco deck and trading: marketplace (1x/turn) plus stockpile 2:1 trades.</li>
+          <li>Win immediately at 7 lairs including possible Spooky bonus for Coco leader.</li>
         </ul>
       </details>
     </section>
@@ -50,11 +51,29 @@
       </div>
 
       <div class="controls">
-        <button @click="rollDice" :disabled="!canRoll">🎲 Roll Dice</button>
-        <button @click="setBuildMode('ship')" :disabled="!canBuild">Build Ship (Lumber + Molasses)</button>
-        <button @click="setBuildMode('hideout')" :disabled="!canBuild">Build Hideout (Lumber + Goat + Molasses + Sword)</button>
-        <button @click="setBuildMode('ghost')" :disabled="!mustMoveGhost">Move Ghost</button>
+        <button @click="rollDie" :disabled="!canRoll">🎲 Roll Die</button>
+        <button @click="setBuildMode('ship')" :disabled="!canTakeActions">Build Ship (Goat + Wood)</button>
+        <button @click="setBuildMode('lair')" :disabled="!canTakeActions">Build Lair (Cutlass + Goat + Molasses + Wood)</button>
+        <button @click="buyCocoTile" :disabled="!canTakeActions">Buy Coco Tile (Cutlass + Molasses + Gold)</button>
         <button @click="endTurn" :disabled="!canEndTurn">End Turn</button>
+      </div>
+
+      <div class="controls">
+        <label>Market trade: give
+          <select v-model="tradeGive"><option v-for="res in resources" :key="`g-${res}`" :value="res">{{ res }}</option></select>
+          take
+          <select v-model="tradeTake"><option v-for="res in resources" :key="`t-${res}`" :value="res">{{ res }}</option></select>
+        </label>
+        <button @click="doMarketplaceTrade" :disabled="!canTakeActions">Marketplace trade (1x/turn)</button>
+      </div>
+
+      <div class="controls">
+        <label>Stockpile trade: 2
+          <select v-model="stockpileFrom"><option v-for="res in resources" :key="`s-${res}`" :value="res">{{ res }}</option></select>
+          for 1
+          <select v-model="stockpileTo"><option v-for="res in resources" :key="`r-${res}`" :value="res">{{ res }}</option></select>
+        </label>
+        <button @click="doStockpileTrade" :disabled="!canTakeActions">Trade 2:1</button>
       </div>
 
       <div class="board-and-sidebar">
@@ -63,7 +82,7 @@
             <g v-for="tile in tiles" :key="`tile-${tile.id}`" @click="handleTileClick(tile)">
               <polygon :points="tile.points" :class="['tile', `res-${tile.resource}`, {ghost: tile.hasGhost}]" />
               <text :x="tile.cx" :y="tile.cy - 10" class="tile-label">{{ tile.resource }}</text>
-              <text :x="tile.cx" :y="tile.cy + 12" class="tile-number">{{ tile.number }}</text>
+              <text :x="tile.cx" :y="tile.cy + 12" class="tile-number">{{ tile.pip ?? '-' }}</text>
               <text v-if="tile.hasGhost" :x="tile.cx" :y="tile.cy + 30" class="ghost-mark">👻</text>
             </g>
           </g>
@@ -88,7 +107,7 @@
               :cx="node.x"
               :cy="node.y"
               r="8"
-              :class="['node', node.owner >= 0 ? 'owned' : 'open', node.owner >= 0 ? `player-${node.owner}` : '', buildMode==='hideout' && canBuildHideoutOn(node) ? 'buildable' : '']"
+              :class="['node', node.owner >= 0 ? 'owned' : 'open', node.owner >= 0 ? `player-${node.owner}` : '', buildMode==='lair' && canBuildLairOn(node) ? 'buildable' : '']"
               @click="handleNodeClick(node)"
             />
           </g>
@@ -98,14 +117,21 @@
           <h3>Players</h3>
           <div v-for="p in players" :key="p.id" class="player-card" :class="{active: p.id === currentPlayer.id}">
             <div class="name" :style="{color: p.color}">{{ p.name }}</div>
-            <div>Hideouts: {{ p.hideouts }}</div>
+            <div>Lairs: {{ p.lairs }} / 7 (Coco: {{ p.cocoTiles }})</div>
+            <div>Next build: {{ p.nextBuildType }}</div>
             <div class="res-list">
               <span v-for="res in resources" :key="`${p.id}-${res}`">{{ res }}: {{ p.resources[res] }}</span>
             </div>
           </div>
 
+          <h3>Supply</h3>
+          <div class="res-list"><span v-for="res in resources" :key="`supply-${res}`">{{ res }}: {{ supply[res] }}</span></div>
+          <h3>Marketplace booths</h3>
+          <div class="res-list"><span v-for="(booth, idx) in marketplace" :key="`booth-${idx}`">{{ idx + 1 }}: {{ booth }}</span></div>
+          <div>Coco deck remaining: {{ cocoDeck.length }}</div>
+
           <p v-if="winnerId !== null" class="winner">
-            🎉 {{ players[winnerId].name }} wins with 7 hideouts!
+            🎉 {{ players[winnerId].name }} wins by reaching 7 lairs!
           </p>
           <p class="hint">{{ hintText }}</p>
         </aside>

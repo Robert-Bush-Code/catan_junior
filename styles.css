@@ -21,10 +21,11 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .tile-number { fill: #111; }
 .tile-label { fill: #102030; font-size: 11px; text-transform: capitalize; }
 .ghost-mark { font-size: 20px; }
-.res-lumber { fill: #83b84f; }
+.res-wood { fill: #83b84f; }
 .res-goat { fill: #f6f1d5; }
 .res-molasses { fill: #9e6535; }
-.res-sword { fill: #8fa3b5; }
+.res-cutlass { fill: #8fa3b5; }
+.res-spooky { fill: #6f6f7f; }
 .res-gold { fill: #e4c445; }
 .edge { stroke-width: 6; stroke-linecap: round; cursor: pointer; }
 .edge.open { stroke: #7f8c8d; }

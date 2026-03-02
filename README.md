@@ -2,62 +2,33 @@
 
 A local, kid-friendly digital board game inspired by **Catan Junior**, built with plain HTML/CSS/JS using Vue and served by a no-dependency Python server.
 
-## Quick start (important)
-
-This project has:
-
-- **Python** only for serving files (`server.py`)
-- **JavaScript** for gameplay logic (`app.js`)
-
-✅ Run this:
+## Quick start
 
 ```bash
 python3 server.py --host 127.0.0.1 --port 8000
 ```
 
-Then open:
+Open <http://127.0.0.1:8000>.
 
-- <http://127.0.0.1:8000>
+## Current rules implementation (Catan Junior focused)
 
-❌ Do **not** run `app.js` with Python.
-
-## If you see this error
-
-```text
-File ".../app.js", line 1
-  const { createApp } = Vue;
-        ^
-SyntaxError: invalid syntax
-```
-
-You accidentally ran JavaScript with Python (for example: `python app.js`).
-
-Use this instead:
-
-```bash
-python3 server.py
-```
-
-## What this includes
-
-- Vue 3 single-page app (loaded via CDN)
-- Procedurally generated hex board
-- 2–4 local hot-seat players
-- Dice rolling and resource production
-- Ghost blocking mechanic on `7`
-- Build ships and hideouts
-- Gold as wildcard payment resource
-- First to 7 hideouts wins
-
-## Notes on rules
-
-This implementation follows commonly known Catan Junior-style mechanics (resource production by dice value, ghost blocking, expansion with ships, and victory via hideouts).
-
-It is a simplified fan prototype for local family play and not an official licensed game.
+- Single die per turn.
+  - `1-5`: all players collect from adjacent lairs on matching pip islands.
+  - `6`: active player must move Ghost Captain and gains 2 resources from chosen island.
+- Ghost Captain starts on Spooky Island and blocks production where placed.
+- Build alternation is enforced (`lair -> ship -> lair -> ...`) after initial setup.
+- Build costs:
+  - Ship: `1 goat + 1 wood`
+  - Lair: `1 cutlass + 1 goat + 1 molasses + 1 wood`
+- Coco tiles are purchasable (`1 cutlass + 1 molasses + 1 gold`) with immediate effects.
+- Trading includes:
+  - Marketplace booth trade (`1:1`, once per turn)
+  - Stockpile trade (`2 identical -> 1 chosen`, unlimited)
+- Win condition: first to 7 lairs (including Coco leader Spooky bonus).
 
 ## Files
 
 - `index.html` – app shell/UI
 - `styles.css` – styling
-- `app.js` – game state and rules logic (JavaScript)
-- `server.py` – static HTTP server using Python standard library only
+- `app.js` – game state and rules logic
+- `server.py` – static HTTP server using Python stdlib
