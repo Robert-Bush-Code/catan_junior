@@ -15,7 +15,7 @@ button { cursor: pointer; background: #fff; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 .status-bar, .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: .8rem; }
 .board-and-sidebar { display: grid; grid-template-columns: minmax(600px, 2fr) minmax(260px, 1fr); gap: 1rem; align-items: start; }
-.board { width: 100%; background: #d9eef9; border-radius: 10px; display: block; aspect-ratio: 4 / 3; }
+.board { width: 100%; background: #bfe6fa; border-radius: 10px; display: block; aspect-ratio: 620 / 760; }
 .tile { stroke: #304050; stroke-width: 2; cursor: pointer; }
 .tile-number, .tile-label, .ghost-mark { text-anchor: middle; pointer-events: none; font-weight: bold; }
 .tile-number { fill: #111; }
@@ -47,3 +47,17 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 @media (max-width: 1000px) {
   .board-and-sidebar { grid-template-columns: 1fr; }
 }
+
+.sea-bg { fill: #b8e5fb; }
+.tile { stroke: #8d6a39; stroke-width: 4; cursor: pointer; }
+.tile-number, .tile-label, .ghost-mark, .die-dots { text-anchor: middle; pointer-events: none; font-weight: bold; }
+.tile-label { font-size: 12px; letter-spacing: .5px; }
+.tile-number { font-size: 24px; }
+.lair-marker { stroke: #fff; stroke-width: 2; }
+.die-dots { fill: #fff; font-size: 14px; letter-spacing: 2px; }
+.player-fill-0 { fill: #e53935; }
+.player-fill-1 { fill: #1e88e5; }
+.player-fill-2 { fill: #43a047; }
+.player-fill-3 { fill: #f4511e; }
+.ghost-pirate-island path { fill: #d8b7de; stroke: #7c5b84; stroke-width: 3; }
+.ghost-pirate-island text { font-size: 42px; }

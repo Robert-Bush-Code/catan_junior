@@ -79,11 +79,18 @@
       <div class="board-and-sidebar">
         <svg class="board" :viewBox="viewBox">
           <g>
+            <rect x="120" y="20" width="620" height="760" class="sea-bg" rx="20" />
             <g v-for="tile in tiles" :key="`tile-${tile.id}`" @click="handleTileClick(tile)">
-              <polygon :points="tile.points" :class="['tile', `res-${tile.resource}`, {ghost: tile.hasGhost}]" />
-              <text :x="tile.cx" :y="tile.cy - 10" class="tile-label">{{ tile.resource }}</text>
-              <text :x="tile.cx" :y="tile.cy + 12" class="tile-number">{{ tile.pip ?? '-' }}</text>
-              <text v-if="tile.hasGhost" :x="tile.cx" :y="tile.cy + 30" class="ghost-mark">👻</text>
+              <ellipse :cx="tile.x" :cy="tile.y" :rx="tile.rx" :ry="tile.ry" :class="['tile', `res-${tile.resource}`, {ghost: tile.hasGhost}]" />
+              <text :x="tile.x" :y="tile.y - 12" class="tile-label">{{ tile.label }}</text>
+              <text :x="tile.x" :y="tile.y + 12" class="tile-number">{{ tile.pip ?? '-' }}</text>
+              <rect v-if="tile.owner >= 0" :x="tile.x - 16" :y="tile.y + 20" width="32" height="32" rx="6" :class="[`player-fill-${tile.owner}`, 'lair-marker']" />
+              <text v-if="tile.owner >= 0" :x="tile.x" :y="tile.y + 41" class="die-dots">•••</text>
+              <text v-if="tile.hasGhost" :x="tile.x" :y="tile.y + 34" class="ghost-mark">👻</text>
+            </g>
+            <g class="ghost-pirate-island">
+              <path d="M640 680 C665 665 700 670 715 692 C726 710 720 740 695 750 C668 760 630 748 623 725 C618 709 624 690 640 680 Z" />
+              <text x="673" y="724">☠️</text>
             </g>
           </g>
 
@@ -106,9 +113,8 @@
               :key="`node-${node.id}`"
               :cx="node.x"
               :cy="node.y"
-              r="8"
-              :class="['node', node.owner >= 0 ? 'owned' : 'open', node.owner >= 0 ? `player-${node.owner}` : '', buildMode==='lair' && canBuildLairOn(node) ? 'buildable' : '']"
-              @click="handleNodeClick(node)"
+              r="12"
+              :class="['node', 'open']"
             />
           </g>
         </svg>
